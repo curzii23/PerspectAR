@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="reuseFunctions.js"></script>
+    <script src="QUIElements.js"></script>
+    <script src="timer.js"></script>
+    <script src="client.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        #counter {
+            font-size: 48px;
+            margin-top: 20px;
+        }
+
+        button {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+        }
+
+        .label-text {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: #ccc;
+            border-radius: 17px;
+            overflow: hidden;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            cursor: pointer;
+            outline: none;
+
+        }
+
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            margin-top: 21px;
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            border-radius: 50%;
+            transition: background-color 0.4s;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .slider::-moz-range-thumb {
+            margin-top: 21px;
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            border-radius: 50%;
+            transition: background-color 0.4s;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #swapRowsButton {
+            display: block;
+            margin: 0;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #swapRowsButton:hover {
+            background-color: #0056b3;
+        }
+
+        #commentContainer textarea {
+            width: 100%;
+            height: 100px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <h1 id="info">Wait for the data load on the large display and your CurvedARScreen before pressing start.</h1>
+
+    <div class="control-panel" id="controlPanel">
+        <div class="toggle-container" id="toggleContainer">
+            <span class="label-text">Curved AR Screen:</span>
+            <label class="toggle">
+                <input type="range" class="slider" id="toggleSlider" min="0" max="1" value="0"
+                    oninput="updateValue(this)" onmouseup="resetSlider(this)" onmouseleave="resetSlider(this)"
+                    ontouchend="resetSlider(this)">
+            </label>
+        </div>
+        <button id="swapRowsButton" onclick="flip()">Flip Rows</button>
+    </div>
+
+
+    <p for="completionTime" id="counter">0 seconds</p>
+
+    <form id="form2" onsubmit="submitAnswer(event)">
+
+        <!-- Inputs for Type Q Questions -->
+        <div id="typeQInputs">
+
+        </div>
+
+        <!-- Inputs for Type S Questions -->
+        <div id="typeSInputs">
+
+        </div>
+
+        <!-- Inputs for Type I Questions -->
+        <div id="typeIInputs">
+
+        </div>
+
+
+        <div id="commentContainer">
+            <label for="commentSelect">Additional Comment:</label>
+            <textarea id="answer" name="comment"></textarea>
+        </div>
+
+        <button type="submit">Submit Answer</button>
+    </form>
+
+
+    <p id="hint"></p>
+
+    <button id="btnStartTimer" onclick="showHideTimer()">Start</button>
+
+    <button id="btnBreak" onclick="updateQuestion()">Begin</button>
+
+
+    <script>
+
+        window.onbeforeunload = function (e) {
+            e.returnValue = 'onbeforeunload';
+            return 'onbeforeunload';
+        };
+
+        let flipCounter = 0;
+        let currentQuestionType = '';
+        let activationTimes = [];
+        let startTimeToogle = null;
+        
+        // Extract the value from the query parameter
+        var urlParams = new URLSearchParams(window.location.search);
+
+        const userName = urlParams.get('userName');
+        const UID = urlParams.get('UID');//User ID
+        const PID = urlParams.get('PID');//Pair ID
+        const userType = urlParams.get('userType');//Large Display, PerspectAR
+        const sType = urlParams.get('studyType');//Pilot, FS1, FS2
+        const myGaze = urlParams.get('mygaze');//Disabled, Enabled
+        var btnBreak = document.getElementById('btnBreak');//break
+        const formElement = document.getElementById('form2');
+        const controlPanel = document.getElementById('controlPanel');
+        const toggleButton = document.getElementById("toggleContainer");
+        
+        const btnStarTimer = document.getElementById('btnStartTimer');
+        const flipButton = document.getElementById('swapRowsButton');
+        const hintQuestionElement = document.getElementById('hint');
+        const h1Info = document.getElementById('info');
+
+        start();
+
+        function updateValue(slider) {
+            if (slider.value === "1") {
+                if (!startTimeToogle) { // Start timer only if it's not already started
+                    startTimeToogle = Date.now();
+                    console.log("Slider is on");
+                    document.querySelector('.toggle').style.backgroundColor = '#2196F3'; // Change to blue
+                    disableCanvas();
+
+                }
+            }
+        }
+
+        function resetSlider(slider) {
+            if (slider.value === "1") { // Only reset if the slider was moved all the way to the right
+                slider.value = "0"; // Reset the slider to the initial position
+                console.log("Slider reset at: " + new Date().toLocaleTimeString());
+                if (startTimeToogle) {
+                    let endTime = Date.now();
+                    let duration = endTime - startTimeToogle;
+                    activationTimes.push({
+                        start: new Date(startTimeToogle).toLocaleTimeString(),
+                        end: new Date(endTime).toLocaleTimeString(),
+                        duration: duration / 1000 // Convert to seconds
+                    });
+                    startTimeToogle = null; // reset startTime
+                }
+                document.querySelector('.toggle').style.backgroundColor = '#ccc'; // Reset the background color
+                enableCanvas();
+            }
+        }
+
+        function start() {
+
+            openWebSocket('ready', userName, userType, sType, true, myGaze, PID, UID);//userName, type, userType, stype, bvirtual, myGaze, PID="none", UID="none"
+
+            // Hide the Break button
+            btnBreak.style.display = 'none';
+            document.getElementById('counter').style.display = 'none';
+            formElement.style.display = 'none';
+            controlPanel.style.display = 'none';
+
+            if (userType.includes("ULD")) {//only hide when large display mode
+                    
+                toggleButton.style.display = 'none';
+            }
+        }
+
+        function showHideTimer() {
+
+            startTimer();
+            formElement.style.display = 'block';
+            h1Info.style.display = 'none';
+
+            if(userType.includes("ULD"))
+            {
+                
+                controlPanel.style.display = currentQuestionType[0] === 'Q' ? 'block' : 'none';
+
+                // Determine if the 'flipButton' should be displayed
+                flipButton.style.display = currentQuestionType[0] === 'Q' ? 'block' : 'none';
+                toggleButton.style.display = userType.includes("ULD") ? 'none' : 'block';
+            }
+            else
+            {
+                controlPanel.style.display = 'block';
+
+                // Determine if the 'flipButton' should be displayed
+                flipButton.style.display = currentQuestionType[0] === 'Q' ? 'block' : 'none';
+            }
+
+
+            btnStarTimer.style.display = 'none';
+        }
+
+        function flip() {
+
+            flipCounter++;
+            sendMessageDynamic({ type: 'sfeature', message: "flip", userType: userType });
+        }
+
+        function disableCanvas() {
+
+            console.log("disablecanvas");
+            sendMessageDynamic({ type: 'smessage', sCode: "disablecanvas", userType: userType, sType: sType });
+
+        }
+
+        function enableCanvas() {
+
+            console.log("enablecanvas");
+            sendMessageDynamic({ type: 'smessage', sCode: "enablecanvas", userType: userType, sType: sType });
+
+        }
+
+        
+        //Update Question
+        function updateQuestion() {
+            
+            sendMessageDynamic({ type: 'begin', message: "none", userType: userType, stype: sType });
+            btnBreak.style.display = 'none';
+            formElement.style.display = 'block';
+            controlPanel.style.display = 'block';
+            btnStarTimer.style.display = 'block';
+        }
+
+        //Send participant data to the server
+        function submitAnswer(event) {
+
+            event.preventDefault(); // Prevent form submission
+            let answerDetails = [];
+            let answerComment = document.getElementById("answer").value.trim();
+
+            // Handle the answer based on the current question type
+            switch (currentQuestionType) {
+                case 'QA':
+                    // Collect values from typeQInputs only
+                    answerDetails = collectValuesFromContainer('typeQInputs');
+                    break;
+                case 'QB':
+                    
+                    answerDetails = collectValuesFromContainer('typeQInputs');
+                case 'QC':
+                    
+                    answerDetails = collectValuesFromContainer('typeQInputs');
+                    break;
+                case 'SA':
+                    // Collect values from typeSInputs only
+                    answerDetails = collectValuesFromContainer('typeSInputs');
+                    break;
+                case 'SB':
+                    
+                    answerDetails = collectValuesFromContainer('typeSInputs');
+                    break;
+                case 'IA':
+                    
+                    answerDetails = collectValuesFromContainer('typeIInputs');
+                    break;
+                case 'IB':
+                    // Collect values from typeIInputs only
+                    answerDetails = collectValuesFromContainer('typeIInputs');
+                    break;
+                default:
+                    // Handle undefined or other types
+                    answerDetails.push("Error: No valid question type defined.");
+                    break;
+            }
+
+            // Construct the final answer including any comments
+            let finalAnswer = answerDetails.join(", ") + " | Comment: " + answerComment;
+
+            // Calculate the completion time for the question
+            const questionTime = (Date.now() - startTime) / 1000; // Calculate elapsed time in seconds
+
+            // Prompt for confirmation before submitting the answer
+            const confirmSubmit = confirm("Are you sure you want to submit your answers? Please confirm the answers with each other before submitting.");
+
+            if (confirmSubmit) {
+
+                resetTimer();
+
+                // Send participant data to the server via WebSocket
+                sendMessageDynamic({
+                    type: 'answer', stype: sType, userName: userName, userType: userType,
+                    completionTime: questionTime, answer: finalAnswer, UID: UID, PID: PID, Flip: flipCounter, ToggleTimes: JSON.stringify(activationTimes)
+                });
+
+                // Reset the form
+                formElement.reset();
+
+                // Reset the flip counter
+                flipCounter = 0;
+                activationTimes = [];
+
+                // Reset form
+                // Loop through all direct child elements of the form
+                // Use Array.from to convert HTMLCollection to an array for easier manipulation
+                Array.from(formElement.children).forEach(child => {
+                    // Check if the child is not one of the exceptions
+                    if (child.id !== 'commentContainer' && child.tagName !== 'BUTTON') {
+                        // Clear all children of this container
+                        while (child.firstChild) {
+                            child.removeChild(child.firstChild);
+                        }
+                    }
+                });
+            }
+            else {
+                // Allow the participant to take more time by resetting the start time
+                resumeTimer(questionTime);
+            }
+
+        }
+
+        ws.onmessage = function (event) {
+  
+            const message = JSON.parse(event.data);
+
+            if (message.type === 'update') {
+                if (message.value != 1) {
+                    formElement.style.display = 'none';
+                    controlPanel.style.display = 'none';
+                    hintQuestionElement.style.display = 'none';
+                    btnStarTimer.style.display = 'block';
+                    h1Info.style.display = 'block';
+
+                    currentQuestionType = message.qindex[0] + message.qindex[2];
+
+                    // Handle different question types using a switch statement
+                    switch (currentQuestionType) {
+                        case 'QA':
+                            QAHandle(message);
+                            break;
+                        case 'QB':
+                            QBHandle(message);
+                            break;
+                        case 'QC':
+                            QCHandle(message);
+                            break;
+                        case 'SA':
+                            SAHandle(message);
+                            break;
+                        case 'SB':
+                            SBHandle(message);
+                            break;
+                        case 'IA':
+                            IAHandle(message);
+                            break;
+                        case 'IB':
+                            IBHandle(message);
+                            break;
+                        default:
+                            console.log('Unhandled question type:', currentQuestionType);
+                            break;
+                    }
+                }
+                else {
+
+                    hintQuestionElement.style.display = 'block';
+                    hintQuestionElement.textContent = "Break";
+
+                    // Show the button
+                    btnBreak.style.display = 'block';
+                    formElement.style.display = 'none';
+                    controlPanel.style.display = 'none';
+                    btnStarTimer.style.display = 'none';
+
+                }
+
+            }
+            if (message.type == "done") {
+                window.onbeforeunload = null;
+                window.location.href = "mobile_ui.html"; // Redirect to the main page
+            }
+            if (message.type == "wait") {
+
+                hintQuestionElement.style.display = 'block';
+                hintQuestionElement.textContent = "Wait for the Collaborator";
+                formElement.style.display = 'none';
+                controlPanel.style.display = 'none';
+                btnStarTimer.style.display = 'none';
+
+            }
+        };
+
+    </script>
+</body>
+
+</html>

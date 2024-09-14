@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <script src="client.js"></script>
+    <title>LD View</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+        #coordinates {
+            position: fixed;
+            background-color: rgba(1, 1, 1, 1);
+            color: yellow;
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 4px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 20;
+			display: none;
+        }
+        svg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10; /* Ensure lines are above the canvas but below the coordinates */
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15; /* Canvas background */
+        }
+    </style>
+</head>
+<body onclick="showCoordinates(event)">
+
+<canvas id="lettersCanvas"></canvas>
+
+<svg>
+    <!-- X-axis line with reduced transparency red color -->
+    <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255, 0, 0, 0.5)" stroke-width="2"/>
+    <!-- Y-axis line with reduced transparency red color -->
+    <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255, 0, 0, 0.5)" stroke-width="2"/>
+</svg>
+
+
+<div id="coordinates">x: 0m, y: 0m</div>
+
+<script>
+    let widthRatio, heightRatio;
+
+    function updateRatios() {
+        widthRatio = 7.26 / window.innerWidth; // meters per pixel in width
+        heightRatio = 1.36 / window.innerHeight; // meters per pixel in height
+    }
+
+    function showCoordinates(event) {
+        updateRatios();
+
+        const xMeters = ((event.clientX - (window.innerWidth / 2)) * widthRatio).toFixed(2);
+        const yMeters = (((window.innerHeight / 2) - event.clientY) * heightRatio).toFixed(2);
+
+        const coordinatesDiv = document.getElementById('coordinates');
+        coordinatesDiv.textContent = `x: ${xMeters}m, y: ${yMeters}m`;
+		
+		// Make the coordinates box visible
+        coordinatesDiv.style.display = "block";
+		
+        coordinatesDiv.style.left = `${event.clientX}px`;
+        coordinatesDiv.style.top = `${event.clientY}px`;
+        coordinatesDiv.style.transform = `translate(${event.clientX > window.innerWidth / 2 ? '-100%' : '0'}, ${event.clientY > window.innerHeight / 2 ? '-100%' : '0'})`;
+    }
+
+    updateRatios(); // Initial ratios update to ensure accuracy
+</script>
+
+<script>
+    // Font size in pixels
+    const fontSizeInPixels = 16;
+	// Font size in centimeters
+	const fontSizeInCm = 0.42;
+	
+    // Function to calculate and return the DPI of the screen
+    function calculateDPI() {
+        // Create an empty div element
+        const div = document.createElement("div");
+        div.style.width = "1in"; // Set the width to 1 inch
+        div.style.visibility = "hidden"; // Make it invisible
+        document.body.appendChild(div); // Add it to the body
+        const dpi = div.offsetWidth; // Measure the width in pixels
+        document.body.removeChild(div); // Remove the div from the body
+        return dpi;
+    }
+
+    // Function to convert font size from pixels to centimeters
+    function fontSizePixelsToCm(fontSizeInPixels) {
+        const dpi = calculateDPI(); // Get the DPI of the screen
+        const inches = fontSizeInPixels / dpi; // Convert pixels to inches
+        const cm = inches * 2.54; // Convert inches to centimeters
+        return cm;
+    }
+	
+	// Function to convert font size from centimeters to pixels
+	function fontSizeCmToPixels(fontSizeInCm) {
+		const dpi = calculateDPI(); // Get the DPI of the screen
+		const inches = fontSizeInCm / 2.54; // Convert centimeters to inches
+		const pixels = inches * dpi; // Convert inches to pixels
+		return pixels;
+	}
+
+    // Calculate font size in centimeters and output it to the console
+    const fontSizeInPxToCm = fontSizePixelsToCm(fontSizeInPixels);
+	const fontSizeInCmToPx = fontSizeCmToPixels(fontSizeInCm);
+	
+    console.log(`Font size In CM: ${fontSizeInPxToCm.toFixed(2)} cm`);
+	console.log(`Font size In Pixels: ${fontSizeInCmToPx.toFixed(2)} pixels`);
+	
+    const canvas = document.getElementById('lettersCanvas');
+    const ctx = canvas.getContext('2d');
+    const colors = [
+        '#FF5733', // Red
+        '#33FF57', // Lime
+        '#3357FF', // Blue
+        '#F333FF', // Magenta
+        '#33FFF3', // Cyan
+        '#F3FF33', // Yellow
+        '#FF3385', // Pink
+        '#FF8333', // Orange
+        '#33FF85', // Green
+        '#8533FF', // Purple
+    ];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function getRandomCharacter() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        return characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function drawRandomCharacters() {
+        const fontSize = 16; // Adjust this to change the font size
+
+		ctx.font = `${fontSize}px Arial`;
+        ctx.fillStyle = 'white';
+
+        const columns = canvas.width / fontSize;
+        const rows = canvas.height / fontSize;
+
+        for (let x = 0; x < columns; x++) {
+            for (let y = 0; y < rows; y++) {
+                const character = getRandomCharacter();
+
+                if (Math.random() < 0.3) {
+                    ctx.fillStyle = getRandomColor(); // Apply a random color
+                } else {
+                    ctx.fillStyle = 'white'; // Default color
+                }
+
+                ctx.fillText(character, x * fontSize, y * fontSize);
+
+                
+            }
+        }
+    }
+    
+    
+    function drawRandomCharactersAndShapes() {
+    const fontSize = 16; // Adjust this to change the font size
+    ctx.font = `${fontSize}px Arial`;
+    const columns = canvas.width / fontSize;
+    const rows = canvas.height / fontSize;
+
+    const emojis = ["😊", "😢", "😔", "🌳", "❤️"]; // Different emojis
+
+    for (let x = 0; x < columns; x++) {
+        for (let y = 0; y < rows; y++) {
+            const randomChoice = Math.random();
+            const xPos = x * fontSize;
+            const yPos = y * fontSize + fontSize; // Adjust for baseline
+
+            if (randomChoice < 0.70) { // 60% text
+                if (randomChoice < 0.20) { // 10% of all, colored text
+                    ctx.fillStyle = getRandomColor();
+                } else { // Remaining 50%, white text
+                    ctx.fillStyle = 'white';
+                }
+                const character = getRandomCharacter();
+                ctx.fillText(character, xPos, yPos);
+            } else if (randomChoice < 0.75) { // Next 20%, emojis
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                ctx.fillText(emoji, xPos, yPos);
+            } else if (randomChoice < 0.80){ // 5% triangle
+                drawTriangle(xPos + fontSize / 2, yPos - fontSize, fontSize);
+            } else if (randomChoice < 0.85) { // Next 5% (split of the remaining 20%), diagonal line
+                drawLine(xPos, yPos - fontSize, xPos + fontSize, yPos);
+            } else if (randomChoice < 0.90) { // Next 5%, straight line
+                drawLine(xPos, yPos - fontSize / 2, xPos + fontSize, yPos - fontSize / 2);
+            } else if (randomChoice < 0.95) { // Next 5%, rectangle
+                ctx.fillStyle = getRandomColor();
+                ctx.fillRect(xPos, yPos - fontSize, fontSize, fontSize);
+            } else { // Final 5%, circle
+                drawCircle(xPos + fontSize / 2, yPos - fontSize / 2, fontSize / 2);
+            }
+        }
+    }
+}
+
+
+function drawLine(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = getRandomColor();
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function drawCircle(x, y, radius) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = getRandomColor();
+    ctx.fill();
+}
+
+function drawTriangle(x, y, size) {
+    ctx.beginPath();
+    ctx.moveTo(x, y); // Starting point at the top
+    ctx.lineTo(x - size / 2, y + size); // Bottom left
+    ctx.lineTo(x + size / 2, y + size); // Bottom right
+    ctx.closePath(); // Go back to the starting point
+    ctx.fillStyle = getRandomColor();
+    ctx.fill();
+}
+
+
+function drawGridWithNames() {
+        const containerNames = Array.from({ length: 48 }, (_, i) => `C${i + 1}`);
+        const columns = 12; // Adjust the number of columns as needed for your display
+        const rows = 4; // Adjust the number of rows as needed for your display
+        const containerWidth = canvas.width / columns;
+        const containerHeight = canvas.height / rows;
+
+        // Dynamically adjust font size based on container size
+        const fontSize = Math.min(containerWidth, containerHeight) / 4; // Example: 1/4th of the smallest container dimension
+        ctx.font = `${fontSize}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Use a vibrant color for the text for better visibility
+        ctx.fillStyle = "rgba(255, 235, 59, 0.9)";
+
+        containerNames.forEach((name, index) => {
+            const column = index % columns;
+            const row = Math.floor(index / columns);
+            const x = column * containerWidth;
+            const y = row * containerHeight;
+
+            // Draw a more vibrant rectangle around each container
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)"; // Bright white for border
+            ctx.lineWidth = 3; // Thicker border for better visibility
+            ctx.strokeRect(x, y, containerWidth, containerHeight);
+
+            // Draw container name, ensuring it's centered within the container
+            const centerX = x + containerWidth / 2;
+            const centerY = y + containerHeight / 2;
+            ctx.fillText(name, centerX, centerY);
+        });
+    }
+    
+    openWebSocket("system", "ID:HL", "n", "n", false, "none");
+
+    ws.onmessage = function(event) {
+        const seed = parseFloat(event.data);
+        Math.seedrandom(seed);
+        drawRandomCharactersAndShapes();
+        drawGridWithNames(); // Draw the grid on top
+    };
+
+    // Initial setup
+    resizeCanvas();
+
+</script>
+
+</body>
+</html>

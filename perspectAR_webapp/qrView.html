@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>QR Anchor</title>
+
+  <style>
+    
+
+    .container {
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-code {
+      width: 12cm;
+      height: 12cm;
+      margin-left: 18cm;
+      margin-top: 16cm;
+      filter: contrast(1) brightness(0.8);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <img src="qr-code.png" alt="QR Code" class="qr-code">
+  </div>
+
+</body>
+
+<script>
+
+  const container = document.querySelector('.container');
+  container.style.width = `${window.innerWidth - 12}px`;
+  container.style.height = `${window.innerHeight - 12}px`;
+
+
+</script>
+
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile UI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .input-group p {
+            width: 150px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        input {
+            width: 80%;
+            height: 30px;
+            padding: 5px;
+        }
+
+        select {
+            width: 80%;
+            height: 30px;
+            padding: 5px;
+        }
+
+        button {
+            width: 120px;
+            height: 40px;
+            margin: 10px;
+        }
+
+        .footer {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+        }
+
+        .footer img {
+            width: 140px;
+            height: 80px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome Participant</h1>
+    <form id="myForm">
+        <div class="input-group">
+            <p>User ID:</p>
+            <select id="UID">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <p>Pair ID:</p>
+            <input id="PID" type="text" name="input2" placeholder="" value="1">
+        </div>
+        <div class="input-group">
+            <p>Login Key:</p>
+            <select id="userName">
+                <option value="temp First">temp First</option>
+                <option value="temp Second">temp Second</option>
+            </select>
+
+        </div>
+        <div class="input-group">
+            <p>User Type:</p>
+            <select id="usertype">
+                <option value="ULD">Large Display</option>
+                <option value="UAR">PerspectAR</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <p>Study Type:</p>
+            <select id="input4">
+                <option value="trial">Training</option>
+                <option value="fs">Full Study Task 1</option>
+                <option value="fs2">Full Study Task 2</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <p>My Gaze:</p>
+            <select id="mygaze">
+                <option value="disablemygaze">Disabled</option>
+                <option value="enablemygaze" selected>Enable</option>
+            </select>
+        </div>
+
+
+        <br>
+        <button>Start</button>
+
+    </form>
+
+    <script>
+
+
+        const form = document.getElementById('myForm');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const selectOption = document.getElementById('input4');
+            const selectedValue = selectOption.value;
+
+            const userName = document.getElementById('userName').value;//user name
+
+            const UIDvalue = document.getElementById('UID').value;
+
+            const PIDvalue = document.getElementById('PID').value;
+
+            const userType = document.getElementById('usertype').value;//study condition
+
+            const myGaze = document.getElementById('mygaze').value;
+
+            const url = "trial.html" + '?userName=' + encodeURIComponent(userName) + 
+            '&UID=' + encodeURIComponent(UIDvalue) + '&PID=' + encodeURIComponent(PIDvalue) +
+            '&userType=' + encodeURIComponent(userType) + userName.trim().split(" ").pop() + 
+            '&studyType=' + encodeURIComponent(selectedValue) + '&mygaze=' + encodeURIComponent(myGaze);
+
+            // Navigate the user to the constructed URL
+            window.location.href = url;
+        });
+    </script>
+
+</body>
+
+</html>

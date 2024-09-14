@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaction Logs for Task Map</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        #logs {
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-left: 5px solid #333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Interaction Log Viewer for Task ID 'S'</h1>
+    <button onclick="downloadCSV()">Download Logs as CSV</button>
+    <button onclick="retrieveLogs()">Show Logs for Task</button>
+    <div id="logs"></div>
+
+    <script>
+
+        const taskIDIndex = 'S'
+
+
+        function retrieveLogs() {
+            const logsContainer = document.getElementById('logs');
+            logsContainer.innerHTML = '';
+            const allLogs = JSON.parse(localStorage.getItem('interactionLogs') || '[]');
+            const filteredLogs = allLogs.filter(log => log.taskId.startsWith(taskIDIndex));
+
+            if (filteredLogs.length === 0) {
+                logsContainer.innerHTML = '<p>No logs found for tasks starting with "S".</p>';
+                return;
+            }
+
+            filteredLogs.forEach(log => {
+                const logDiv = document.createElement('div');
+                logDiv.classList.add('log-entry');
+                logDiv.innerHTML = `
+                <strong>Timestamp:</strong> ${log.timestamp}<br>
+                <strong>Event Type:</strong> ${log.eventType}<br>
+                <strong>Task ID:</strong> ${log.taskId}<br>
+                <strong>Details:</strong> ${JSON.stringify(log.details, null, 2)}
+            `;
+                logsContainer.appendChild(logDiv);
+            });
+        }
+
+        function downloadCSV() {
+            const allLogs = JSON.parse(localStorage.getItem('interactionLogs') || '[]');
+            const filteredLogs = allLogs.filter(log => log.taskId.startsWith(taskIDIndex));
+            let csvContent = "Timestamp,EventType,Task ID,Details\n";
+
+            filteredLogs.forEach(log => {
+                const detailsString = JSON.stringify(log.details).replace(/"/g, '""');
+                csvContent += `"${log.timestamp}","${log.eventType}","${log.taskId}","${detailsString}"\n`;
+            });
+
+
+            // Send the CSV content to the server
+            fetch('http://localhost:3000/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    csvContent: csvContent,
+                    filename: `task_${taskIDIndex}_logs.csv`,
+                    email: 'demo@demo.com' // Replace with the recipient's email address
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Email sent successfully!');
+                    } else {
+                        alert('Failed to send email.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+    </script>
+</body>
+
+</html>
