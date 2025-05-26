@@ -2,7 +2,7 @@
 
 ![PerspectAR](img/teaser.jpg)
 
-PerspectAR is a perspective-compensated interface using an augmented reality headset. The project consists of two main parts:
+PerspectAR is a perspective-compensated interface using an augmented reality headset. You will need to import the Vuplex API or remove the corresponding components from the objects. The project consists of two main parts:
 
 1. Compiling and Running the PerspectAR application on HoloLens2.
 2. Setting up a visualization website deployed using XAMPP.
@@ -81,4 +81,4 @@ Congrats on reaching this point! If you want to align PerspectAR with a large di
 
 ### Reference
 
-The paper titled **"PerspectAR: Addressing Perspective Distortion on Very Large Displays with Adaptive Augmented Reality Overlays"** is currently under review at **CHI 2025**.
+Raza, M., Ketsoi, V., Malloch, J., Bashbaghi, S., Purmehdi, H., & Reilly, D. (2025). *PerspectAR: Addressing Perspective Distortion on Very Large Displays with Adaptive Augmented Reality Overlays*. In *Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems (CHI '25)*. Association for Computing Machinery, Article 34, 1–21. [https://doi.org/10.1145/3706598.3713389](https://doi.org/10.1145/3706598.3713389)
