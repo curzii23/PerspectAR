@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Local Storage</title>
+</head>
+<body>
+    <h1>Manage Local Storage</h1>
+    <button onclick="clearLocalStorage()">Clear All Data</button>
+    <p id="statusMessage"></p>
+
+    <script>
+        function clearLocalStorage() {
+            // Clear local storage
+            localStorage.clear();
+            document.getElementById('statusMessage').textContent = 'Local storage cleared successfully!';
+        }
+    </script>
+</body>
+</html>

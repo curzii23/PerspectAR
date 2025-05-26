@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="client.js"></script>
+    <title>Calib UI</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label, input, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <form id="dataForm">
+        <label for="depthZ">CurvedARScreen Initial Depth Z</label>
+        <input type="text" id="depthZ" name="depthZ" required value="0.001"><br>
+        <label for="angle">CurvedARScreen Maximum Perspective Compensation Angle</label>
+        <input type="text" id="angle" name="angle" required value="70"><br>
+        <label for="scale">Transparent Window Initial Scale X</label>
+        <input type="text" id="scale" name="scale" required value="0.2"><br>
+        <button type="button" onclick="sendData()">Send Data</button>
+    </form>
+    
+    <script>
+        function sendData() {
+            const depthZValue = document.getElementById('depthZ').value;
+            const angleValue = document.getElementById('angle').value;
+            const scaleValue = document.getElementById('scale').value;
+
+            if (!depthZValue || !angleValue || !scaleValue) {
+                alert('Please enter DepthZ, Angle, and TM Scale values before sending.');
+                return;
+            }
+            
+            sendMessageCalib('scalib', depthZValue, angleValue, scaleValue);
+
+        }
+    </script>
+</body>
+</html>

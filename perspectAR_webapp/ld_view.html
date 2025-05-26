@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="client.js"></script>
+  <script src="linechartgen.js" defer></script>
+  <title>Large Display Visualization</title>
+
+  <style>
+    /*11520px, 2160px, 5760px, 1080px*/
+    /*
+    body{
+      overflow: hidden;
+      background-color: black;
+    }
+    */
+
+    :root {
+      --width: 11520px;
+      --height: 2160px;
+      --multiplier: 2;
+      --section_width: calc((var(--width) / 3) - 2px);
+      --section_height: calc((var(--height)) - 2px);
+      --panel_width: calc((var(--section_width) / 2) - 1);
+      --panel_height: calc((var(--section_height) / 2) - 1);
+      --font_size_one: calc(var(--multiplier) * 24px);
+      --font_size_two: calc(var(--multiplier) * 20px);
+      --font_size_three: calc(var(--multiplier) * 16px);
+      --font_size_four: calc(var(--multiplier) * 20px);
+      --stroke_width: calc(var(--multiplier) * 2px);
+    }
+
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      width: var(--width);
+      height: var(--height);
+      /*gap: 0px;*/
+
+      gap: 2px;
+      background-color: #1B2631;
+
+    }
+
+    .section {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+
+    .section-left,
+    .section-center,
+    .section-right {
+      width: var(--section_width);
+      height: var(--section_height);
+    }
+
+    .sub-panel {
+      width: var(--panel_width);
+      height: var(--panel_height);
+      position: relative;
+      background-color: #1B2631;
+    }
+
+    .chart-title {
+      fill: white;
+      font-size: var(--font_size_one);
+      font-weight: bold;
+      text-anchor: middle;
+    }
+
+    .axis-label {
+      fill: white;
+      font-size: var(--font_size_two);
+      font-weight: bold;
+      text-anchor: middle;
+    }
+
+    .axis text {
+      fill: red;
+      font-size: var(--font_size_three);
+    }
+
+    .legend {
+      fill: white;
+      font-family: sans-serif;
+      font-size: var(--font_size_four);
+      text-anchor: start;
+    }
+
+    .legend-line {
+      stroke: orange;
+      stroke-width: var(--stroke_width);
+    }
+
+    .axis path,
+    .axis line {
+      stroke: red;
+      stroke-width: var(--stroke_width);
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="container">
+    <div class="section section-left"></div>
+    <div class="section section-center"></div>
+    <div class="section section-right"></div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      start();
+
+      function start() {
+
+        create(1918, 1078);
+        openWebSocket("system", "ID:HL", "n", "n", false, "none");
+
+      }
+
+      function finish() {
+
+        lastImageUrl = "";
+        container.style.backgroundImage = 'none';
+        create(1918, 1078);
+      }
+
+
+      ws.addEventListener('message', async (event) => {
+        try {
+          const message = JSON.parse(event.data);
+
+          if (message.type === 'system') {
+            setup(message);
+            if (message.qindex[0] === 'Q') {
+              await createQuestionData(message.qindex[0] + message.qindex[1]);
+            } else if (message.qindex[0] === 'S') {
+              createImageSearchLargeDisplay(message);
+            } else if (message.qindex[0] === 'I') {
+              createImageInsight(message);
+            }
+          } else if (message.type === 'done') {
+            removeElements();
+            finish();
+          } else if (message.type === 'sfeature') {
+            swapRowsAcrossSections();
+          }
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
+      });
+
+
+    });
+
+  </script>
+
+
+</body>
+
+</html>

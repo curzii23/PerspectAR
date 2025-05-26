@@ -1,0 +1,97 @@
+PairID,Participant ID,Condition,Visualization,Distance,Dataset
+Pair1,P1,Large Display,Search,36.53317867,Full Study 2
+Pair1,P1,Large Display,WEATHER,33.24148347,Full Study 2
+Pair1,P1,PerspectAR,Search,50.90447752,Full Study 1
+Pair1,P1,PerspectAR,WEATHER,47.93709406,Full Study 1
+Pair1,P2,Large Display,Search,37.49535482,Full Study 2
+Pair1,P2,Large Display,WEATHER,31.03857799,Full Study 2
+Pair1,P2,PerspectAR,Search,36.76153251,Full Study 1
+Pair1,P2,PerspectAR,WEATHER,44.78724504,Full Study 1
+Pair2,P1,Large Display,Search,50.86176328,Full Study 2
+Pair2,P1,Large Display,WEATHER,22.74516644,Full Study 2
+Pair2,P1,PerspectAR,Search,40.20016529,Full Study 1
+Pair2,P1,PerspectAR,WEATHER,45.18017858,Full Study 1
+Pair2,P2,Large Display,Search,38.91494833,Full Study 2
+Pair2,P2,Large Display,WEATHER,23.28328682,Full Study 2
+Pair2,P2,PerspectAR,Search,49.27814717,Full Study 1
+Pair2,P2,PerspectAR,WEATHER,43.70299032,Full Study 1
+Pair3,P1,Large Display,Search,26.83746129,Full Study 1
+Pair3,P1,Large Display,WEATHER,36.82980929,Full Study 1
+Pair3,P1,PerspectAR,Search,29.45127187,Full Study 2
+Pair3,P1,PerspectAR,WEATHER,36.79216811,Full Study 2
+Pair3,P2,Large Display,Search,22.85073184,Full Study 1
+Pair3,P2,Large Display,WEATHER,35.0973275,Full Study 1
+Pair3,P2,PerspectAR,Search,34.45148397,Full Study 2
+Pair3,P2,PerspectAR,WEATHER,48.07723846,Full Study 2
+Pair4,P1,Large Display,Search,24.33653682,Full Study 1
+Pair4,P1,Large Display,WEATHER,37.27047913,Full Study 1
+Pair4,P1,PerspectAR,Search,36.77441104,Full Study 2
+Pair4,P1,PerspectAR,WEATHER,42.25029504,Full Study 2
+Pair4,P2,Large Display,Search,21.01080554,Full Study 1
+Pair4,P2,Large Display,WEATHER,40.99273205,Full Study 1
+Pair4,P2,PerspectAR,Search,36.96570353,Full Study 2
+Pair4,P2,PerspectAR,WEATHER,45.91146754,Full Study 2
+Pair5,P1,Large Display,Search,50.69415994,Full Study 1
+Pair5,P1,Large Display,WEATHER,55.20546889,Full Study 1
+Pair5,P1,PerspectAR,Search,30.40540472,Full Study 2
+Pair5,P1,PerspectAR,WEATHER,38.96742046,Full Study 2
+Pair5,P2,Large Display,Search,46.21645149,Full Study 1
+Pair5,P2,Large Display,WEATHER,65.26838459,Full Study 1
+Pair5,P2,PerspectAR,Search,33.21759649,Full Study 2
+Pair5,P2,PerspectAR,WEATHER,34.95160953,Full Study 2
+Pair6,P1,Large Display,Search,49.07242025,Full Study 1
+Pair6,P1,Large Display,WEATHER,49.18234491,Full Study 1
+Pair6,P1,PerspectAR,Search,45.70665794,Full Study 2
+Pair6,P1,PerspectAR,WEATHER,31.60933463,Full Study 2
+Pair6,P2,Large Display,Search,27.21272767,Full Study 1
+Pair6,P2,Large Display,WEATHER,30.99118349,Full Study 1
+Pair6,P2,PerspectAR,Search,22.10007905,Full Study 2
+Pair6,P2,PerspectAR,WEATHER,17.70561058,Full Study 2
+Pair7,P1,Large Display,Search,35.19049631,Full Study 2
+Pair7,P1,Large Display,WEATHER,64.27057421,Full Study 2
+Pair7,P1,PerspectAR,Search,42.8606888,Full Study 1
+Pair7,P1,PerspectAR,WEATHER,44.94523006,Full Study 1
+Pair7,P2,Large Display,Search,49.70513845,Full Study 2
+Pair7,P2,Large Display,WEATHER,80.99361757,Full Study 2
+Pair7,P2,PerspectAR,Search,74.00022911,Full Study 1
+Pair7,P2,PerspectAR,WEATHER,65.31938467,Full Study 1
+Pair8,P1,Large Display,Search,49.18325859,Full Study 2
+Pair8,P1,Large Display,WEATHER,63.44542819,Full Study 2
+Pair8,P1,PerspectAR,Search,40.14825258,Full Study 1
+Pair8,P1,PerspectAR,WEATHER,44.07325823,Full Study 1
+Pair8,P2,Large Display,Search,55.71346368,Full Study 2
+Pair8,P2,Large Display,WEATHER,87.81160871,Full Study 2
+Pair8,P2,PerspectAR,Search,41.27986008,Full Study 1
+Pair8,P2,PerspectAR,WEATHER,62.19080915,Full Study 1
+Pair9,P1,Large Display,Search,39.13481009,Full Study 2
+Pair9,P1,Large Display,WEATHER,68.5681089,Full Study 2
+Pair9,P1,PerspectAR,Search,59.94766476,Full Study 1
+Pair9,P1,PerspectAR,WEATHER,68.83267941,Full Study 1
+Pair9,P2,Large Display,Search,33.78493501,Full Study 2
+Pair9,P2,Large Display,WEATHER,67.66572737,Full Study 2
+Pair9,P2,PerspectAR,Search,47.5156548,Full Study 1
+Pair9,P2,PerspectAR,WEATHER,61.90937126,Full Study 1
+Pair10,P1,Large Display,Search,52.66508966,Full Study 2
+Pair10,P1,Large Display,WEATHER,46.5393515,Full Study 2
+Pair10,P1,PerspectAR,Search,30.55634096,Full Study 1
+Pair10,P1,PerspectAR,WEATHER,27.26998879,Full Study 1
+Pair10,P2,Large Display,Search,61.95512264,Full Study 2
+Pair10,P2,Large Display,WEATHER,65.93349869,Full Study 2
+Pair10,P2,PerspectAR,Search,44.59103751,Full Study 1
+Pair10,P2,PerspectAR,WEATHER,33.88888123,Full Study 1
+Pair11,P1,Large Display,Search,76.13535537,Full Study 2
+Pair11,P1,Large Display,WEATHER,68.00792706,Full Study 2
+Pair11,P1,PerspectAR,Search,79.05322487,Full Study 1
+Pair11,P1,PerspectAR,WEATHER,72.61476582,Full Study 1
+Pair11,P2,Large Display,Search,44.11366704,Full Study 2
+Pair11,P2,Large Display,WEATHER,53.92993392,Full Study 2
+Pair11,P2,PerspectAR,Search,74.94535279,Full Study 1
+Pair11,P2,PerspectAR,WEATHER,84.50909578,Full Study 1
+Pair12,P1,Large Display,Search,44.80172726,Full Study 1
+Pair12,P1,Large Display,WEATHER,62.00583991,Full Study 1
+Pair12,P1,PerspectAR,Search,58.41121295,Full Study 2
+Pair12,P1,PerspectAR,WEATHER,51.67342652,Full Study 2
+Pair12,P2,Large Display,Search,57.04672462,Full Study 1
+Pair12,P2,Large Display,WEATHER,67.3485877,Full Study 1
+Pair12,P2,PerspectAR,Search,77.03257476,Full Study 2
+Pair12,P2,PerspectAR,WEATHER,68.75156476,Full Study 2

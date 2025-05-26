@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="transparent" content="true">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="client.js"></script>
+  <script src="linechartgen.js" defer></script>
+  <title>2nd HoloLens2 Visualization</title>
+
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 5760px;
+      height: 1080px;
+      gap: 0px;
+      position: relative;
+    }
+
+    .section {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .section-left {
+      width: 1918px;
+      height: 1078px;
+      background-color: transparent;
+    }
+
+    .section-center {
+      width: 1918px;
+      height: 1078px;
+      background-color: transparent;
+    }
+
+    .section-right {
+      width: 1918px;
+      height: 1078px;
+      background-color: transparent;
+    }
+
+    .sub-panel {
+      width: 959px;
+      height: 539px;
+      position: relative;
+      background-color: #1B2631;
+    }
+
+
+    .chart-title {
+      fill: white;
+      font-size: 28px;
+      font-weight: bold;
+      text-anchor: middle;
+    }
+
+    .axis-label {
+      fill: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-anchor: middle;
+    }
+
+    .axis text {
+      fill: red;
+      font-size: 16px;
+    }
+
+    .legend {
+      fill: white;
+      font-family: sans-serif;
+      font-size: 20px;
+      text-anchor: start;
+    }
+
+    .legend-line {
+      stroke: orange;
+      stroke-width: 2px;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: red;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="section section-left"></div>
+    <div class="section section-center"></div>
+    <div class="section section-right"></div>
+
+  </div>
+  <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var debugMe = false;
+
+      start();
+
+      function start() {
+        create(959, 539);
+        openWebSocket("system", "ID:HLTwo", "n", "n", false, "none");
+
+      }
+
+      const rectangle = document.querySelector('.transparent-rectangle');
+
+      function finish() {
+
+        container.style.backgroundImage = 'none';
+        create(959, 539);
+      }
+
+      //Geospatial Airport images bounding box with coordinates
+      function displayBoundingBox(x, y) {
+
+        const oldWidth = 11520;
+        const oldHeight = 2160;
+        const newWidth = 5760;
+        const newHeight = 1080;
+
+        // Calculate new coordinates based on the scaling
+        let newX = Math.round(x * (newWidth / oldWidth));
+        let newY = Math.round(y * (newHeight / oldHeight));
+
+        let bbox = document.getElementById('boundingBox');
+
+        if (!bbox) {
+          bbox = document.createElement('div');
+          bbox.id = 'boundingBox';
+          document.body.appendChild(bbox);
+          bbox.style.position = 'absolute';
+          bbox.style.border = '2px solid black';
+          bbox.style.backgroundColor = 'white';
+        }
+
+        const bboxWidth = bbox.offsetWidth;
+        const bboxHeight = bbox.offsetHeight;
+        const maxX = container.offsetWidth - bboxWidth;
+        const maxY = container.offsetHeight - bboxHeight;
+
+        // Adjust if the new position is out of bounds considering the bounding box size
+        if (newX > maxX) newX = maxX;
+        if (newX < 0) newX = 0;
+        if (newY > maxY) newY = maxY;
+        if (newY < 0) newY = 0;
+
+        bbox.style.left = `${newX}px`;
+        bbox.style.top = `${newY}px`;
+        bbox.style.width = `100px`;
+        bbox.style.height = `100px`;
+        bbox.style.display = 'flex';
+        bbox.style.fontSize = '28px';
+        bbox.style.fontWeight = 'bold';
+        bbox.innerText = `X: ${x}, Y: ${y}`;
+      }
+
+      //Weather chart data with tooltip including temperature and date
+      function displayInteractiveText(svgTitle, text, x, y) {
+        // Find the SVG by its title
+        let svgs = document.querySelectorAll('svg');
+        let targetSvg = Array.from(svgs).find(svg => {
+          let titleElement = svg.querySelector('.chart-title');
+          return titleElement && titleElement.textContent === svgTitle;
+        });
+
+        if (!targetSvg) {
+          console.error('SVG not found for title:', svgTitle);
+          return;
+        }
+
+        // Update or create interactive text within the found SVG
+        let interactiveText = targetSvg.querySelector('.interactive-text');
+        if (!interactiveText) {
+          interactiveText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          interactiveText.setAttribute('class', 'interactive-text');
+          interactiveText.setAttribute('fill', 'white');
+          interactiveText.setAttribute('font-size', '28px');
+          interactiveText.setAttribute('font-weight', 'bold');
+          targetSvg.appendChild(interactiveText);
+        }
+
+        // Measure text element size
+        let bbox = interactiveText.getBBox();
+        const svgRect = targetSvg.getBoundingClientRect();
+
+        // Adjust x and y to ensure the text stays within the bounds of the container
+        if (x + bbox.width > svgRect.width) x = svgRect.width - bbox.width;
+        if (x < 0) x = 0;
+        if (y - bbox.height < 0) y = bbox.height;
+        if (y > svgRect.height) y = svgRect.height;
+
+
+        interactiveText.textContent = text;
+        interactiveText.setAttribute('x', x);
+        interactiveText.setAttribute('y', y);
+        interactiveText.style.display = 'block';
+      }
+
+
+
+      ws.addEventListener('message', async (event) => {
+        try {
+          const message = JSON.parse(event.data);
+
+          if (message.type === 'system') {
+            setup(message);
+            if (message.qindex[0] === 'Q') {
+              await createQuestionData(message.qindex[0]+message.qindex[1]);
+            } else if (message.qindex[0] === 'S') {
+              createImageSearchCurvedARScreen(message);
+            } else if (message.qindex[0] === 'I') {
+              createImageInsight(message);
+            }
+          }
+          else if (message.type === 'done') {
+            finish();
+          } else if (message.type === 'sfeature') {
+            swapRowsAcrossSections();
+          }
+          else if (message.type === 'bbox') {
+            displayBoundingBox(message.X, message.Y);
+          }
+          else if (message.type === 'temp') {
+            displayInteractiveText(message.svgTitle, message.text, message.X, message.Y);
+          }
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
+      });
+    });
+
+  </script>
+
+
+</body>
+
+</html>
